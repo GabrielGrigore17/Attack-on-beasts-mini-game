@@ -155,7 +155,7 @@ void CPlayer::Move(ULONG ulDirection)
 		m_pSprite->mVelocity.y += 5.1;
 	}
 
-	if (m_pSprite->mPosition.y > desktop.bottom - m_pSprite->height() / 2 -80)
+	if (m_pSprite->mPosition.y > desktop.bottom - m_pSprite->height() / 2 -160)
 	{
 		m_pSprite->mVelocity.y = 0;
 		if (m_pSprite->mVelocity.y == 0)

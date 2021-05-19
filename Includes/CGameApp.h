@@ -111,7 +111,9 @@ private:
 	Enemy* m_pEnemy;
 	int lives=10;
 	int score = 0;
-	int x = 100;
+
+
+	int x = 0;
 
 };
 

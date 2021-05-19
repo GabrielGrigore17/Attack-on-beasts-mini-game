@@ -113,33 +113,36 @@ void Lives::Draw()
 }
 
 void Lives::Move(ULONG ulDirection)
-{
+{     
+	RECT desktop;
+	GetWindowRect(GetDesktopWindow(), &desktop);
+
+
 	if (ulDirection & Lives::DIR_LEFT)
-		m_pSprite->mVelocity.x -= 0.2;
-	if (m_pSprite->mPosition.x < m_pSprite->width() / 2)
+		m_pSprite->mVelocity.x -= 0.3;
+	if (m_pSprite->mPosition.x < 0)
+	{
+		m_pSprite->mPosition.x = desktop.right + 500;
 		m_pSprite->mVelocity.x = 0;
+	}
+
 
 	if (ulDirection & Lives::DIR_RIGHT)
 		m_pSprite->mVelocity.x += 0.2;
 
 
-	if (m_pSprite->mPosition.x > 780 - m_pSprite->width() / 2)
-	{
-		m_pSprite->mVelocity.x = 0;
-		if (m_pSprite->mVelocity.x == 0)
-			m_pSprite->mPosition.x--;
-	}
+	
 
 
 	if (ulDirection & Lives::DIR_FORWARD)
-		m_pSprite->mVelocity.y -= 0.2;
-	if (m_pSprite->mPosition.y < m_pSprite->height() / 2)
+		m_pSprite->mVelocity.y -= 0.3;
+	if (m_pSprite->mPosition.y < desktop.bottom - 350)
 		m_pSprite->mVelocity.y = 0;
 
 	if (ulDirection & Lives::DIR_BACKWARD)
-		m_pSprite->mVelocity.y += 0.2;
+		m_pSprite->mVelocity.y += 0.3;
 
-	if (m_pSprite->mPosition.y > 560 - m_pSprite->height() / 2)
+	if (m_pSprite->mPosition.y > desktop.bottom - m_pSprite->height() / 2 - 160)
 	{
 		m_pSprite->mVelocity.y = 0;
 		if (m_pSprite->mVelocity.y == 0)

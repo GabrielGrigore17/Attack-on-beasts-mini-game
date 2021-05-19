@@ -354,12 +354,12 @@ void CGameApp::SetupGameState()
 {
 	RECT desktop;
 	GetWindowRect(GetDesktopWindow(), &desktop);
-	m_pPlayer->Position() = Vec2(200, desktop.bottom-100);
+	m_pPlayer->Position() = Vec2(200, desktop.bottom-220);
 	//m_pPlayer2->Position() = Vec2(100, 400);
-	m_pEnemy->Position() = Vec2(desktop.right, 900);
+	m_pEnemy->Position() = Vec2(desktop.right, 720);
 	//m_cCrate->Position() = Vec2(200,100);
 	//m_cCrate1->Position() = Vec2(600, 50);
-	//m_pHeart->Position() = Vec2(400,200);
+	m_pHeart->Position() = Vec2(desktop.right+300, desktop.bottom -250);
 	
 }
 
@@ -530,14 +530,14 @@ void CGameApp::ProcessInput( )
 	
 	srand((unsigned)time(0));
 	printf("Your dice has been rolled! You got: \n ");
-	int result = 1 + (rand() % 1);
+	int result = 1 + (rand() % 3);
 	
 	switch (result) {
-	//case 1:
+	case 1:
 		//Direction3 |= Enemy::DIR_FORWARD;
 		//Direction4 |= Crate::DIR_LEFT;
 		//Direction5 |= Crate::DIR_BACKWARD;
-		//Direction6 |= Lives::DIR_FORWARD;
+		Direction6 |= Lives::DIR_FORWARD;
 		break;
 	//case 2:
 		//Direction3 |= Enemy::DIR_BACKWARD;
@@ -546,18 +546,18 @@ void CGameApp::ProcessInput( )
 		//Direction6 |= Lives::DIR_RIGHT;
 		//m_pEnemy->Shoot();
 	//	break;
-	case 1:
+	case 2:
 		Direction3 |= Enemy::DIR_LEFT;
 		//Direction4 |= Crate::DIR_RIGHT;
 		//Direction5 |= Crate::DIR_LEFT;
-		//Direction6 |= Lives::DIR_BACKWARD;
+		Direction6 |= Lives::DIR_BACKWARD;
 		
 		break;
-	//case 2:
+	case 3:
 		//Direction3 |= Enemy::DIR_RIGHT;
 		//Direction4 |= Crate::DIR_BACKWARD;
 		//Direction5 |= Crate::DIR_FORWARD;
-		//Direction6 |= Lives::DIR_LEFT;
+		Direction6 |= Lives::DIR_LEFT;
 		//m_pEnemy->Shoot();
 		//break;
 	}
@@ -575,13 +575,16 @@ void CGameApp::ProcessInput( )
 	{
 		std::ofstream output;
 		output.open("data/save.txt");
-		double x1_axis, y1_axis, x2_axis, y2_axis;
+		double x1_axis, y1_axis, x2_axis, y2_axis,x3_axis,y3_axis;
 		m_pPlayer->GeterPositionX(x1_axis);
 		m_pPlayer->GeterPositionY(y1_axis);
-		m_pPlayer2->GeterPositionX(x2_axis);
-		m_pPlayer2->GeterPositionY(y2_axis);
+		m_pEnemy->GeterPositionX(x2_axis);
+		m_pEnemy->GeterPositionY(y2_axis);
+		m_pHeart->GeterPositionX(x3_axis);
+		m_pHeart->GeterPositionY(y3_axis);
  		output << x1_axis << " " << y1_axis<<" ";
-		output << x2_axis << " " << y2_axis;
+		output << x2_axis << " " << y2_axis << " ";
+		output << x3_axis << " " << y3_axis;
 		output.close();
 	}
 
@@ -589,10 +592,11 @@ void CGameApp::ProcessInput( )
 	{
 		std::ifstream input;
 		input.open("data/save.txt");
-		double x1_axis, y1_axis, x2_axis, y2_axis;
-		input >> x1_axis >> y1_axis>> x2_axis>> y2_axis;
+		double x1_axis, y1_axis, x2_axis, y2_axis, x3_axis, y3_axis;
+		input >> x1_axis >> y1_axis>> x2_axis>> y2_axis>> x3_axis>> y3_axis;
 		m_pPlayer->Position() = Vec2(x1_axis, y1_axis);
-		m_pPlayer2->Position() = Vec2(x2_axis, y2_axis);
+		m_pEnemy->Position() = Vec2(x2_axis, y2_axis);
+		m_pHeart->Position() = Vec2(x3_axis, y3_axis);
 		input.close();
 	}
 
@@ -636,7 +640,7 @@ void CGameApp::AnimateObjects()
 	//m_cCrate->Update(m_Timer.GetTimeElapsed());
 	//m_cCrate1->Update(m_Timer.GetTimeElapsed());
 	m_pEnemy->Update(m_Timer.GetTimeElapsed());
-	//m_pHeart->Update(m_Timer.GetTimeElapsed());
+	m_pHeart->Update(m_Timer.GetTimeElapsed());
 
 }
 
@@ -650,11 +654,13 @@ void CGameApp::DrawObjects()
 
 	//m_imgBackground.Paint(m_pBBuffer->getDC(), 0, 0);
 
+	RECT desktop;
+	GetWindowRect(GetDesktopWindow(), &desktop);
 
-	m_imgBackground.Paint(m_pBBuffer->getDC(), x-400,0);
-	x = x + 2;
-	    if (x == 400)
-			x =-200;
+	m_imgBackground.Paint(m_pBBuffer->getDC(), x,0);
+	x = x - 2;
+	    if (x ==-2316)
+			x = 0;
 		
 	
 
@@ -663,7 +669,7 @@ void CGameApp::DrawObjects()
 	//m_cCrate->Draw();
 	//m_cCrate1->Draw();
 	m_pEnemy->Draw();
-	//m_pHeart->Draw();
+	m_pHeart->Draw();
 
 	m_pBBuffer->present();
 
@@ -752,6 +758,7 @@ bool CGameApp::checkCollisionPBE()
 	{
 		fTimer = SetTimer(m_hWnd, 1, 250, NULL);
 		m_pEnemy->Explode();
+		
 		return true;
 	}
 
@@ -767,6 +774,9 @@ bool CGameApp::checkCollisionEBP()
 	{
 		fTimer = SetTimer(m_hWnd, 1, 250, NULL);
 		m_pPlayer->Explode();
+		RECT desktop;
+		GetWindowRect(GetDesktopWindow(), &desktop);
+		m_pPlayer->Position() = Vec2(200, desktop.bottom - 220);
 		return true;
 	}
 
@@ -791,7 +801,9 @@ bool CGameApp::checkCollisionL()
 	{
 		fTimer = SetTimer(m_hWnd, 1, 250, NULL);
 		m_pHeart->Explode();
-		
+		RECT desktop;
+		GetWindowRect(GetDesktopWindow(), &desktop);
+		m_pHeart->Position() = Vec2(desktop.right + 300, desktop.bottom - 250);
 		return true;
 	}
 

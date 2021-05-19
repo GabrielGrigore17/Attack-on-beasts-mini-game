@@ -1,3 +1,5 @@
 ﻿cl : command line warning D9035: option 'Gm' has been deprecated and will be removed in a future release
-  CPlayer.cpp
+  CGameApp.cpp
+D:\GameFramework\Source\CGameApp.cpp(87,19): warning C4244: 'initializing': conversion from 'LONG' to 'USHORT', possible loss of data
+D:\GameFramework\Source\CGameApp.cpp(88,20): warning C4244: 'initializing': conversion from 'LONG' to 'USHORT', possible loss of data
   Game.vcxproj -> D:\GameFramework\d_Game.exe
