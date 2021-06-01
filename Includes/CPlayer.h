@@ -63,6 +63,7 @@ public:
 	void                  GeterPositionY(double &y);
 	double                getWidth();
 	bool                  ifExploded();
+	bool				ifWalking();
 	void                  MoveLeft(const BackBuffer* pBackBuffer);
 	void                  MoveRight(const BackBuffer* pBackBuffer);
 	void                  MoveUp(const BackBuffer* pBackBuffer);
@@ -72,6 +73,8 @@ public:
 
 	void					Explode();
 	bool					AdvanceExplosion();
+	void	Walk();
+	bool AdvanceWalk();
 	void                    Shoot();
 	void                   checkShoot();
 private:
@@ -85,10 +88,14 @@ private:
 	float					m_fTimer;
 	
 	bool					m_bExplosion;
+	bool					m_bWalking;
 	bool                    m_bullet;
 	
 	AnimatedSprite*			m_pExplosionSprite;
+	AnimatedSprite* m_pWalkingSprite;
+
 	int						m_iExplosionFrame;
+	int						m_iWalkingFrame;
 	
 };
 

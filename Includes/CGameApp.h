@@ -85,7 +85,6 @@ private:
 	
 	HWND					m_hWnd;			 // Main window HWND
 	HICON				   m_hIcon;			// Window Icon
-	HMENU				   m_hMenu;			// Window Menu
 	
 	bool					m_bActive;		  // Is the application active ?
 

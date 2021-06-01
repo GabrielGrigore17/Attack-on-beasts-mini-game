@@ -82,7 +82,7 @@ void CPlayer2::Update(float dt)
 		if (v > 35.0f)
 		{
 			m_eSpeedState = SPEED_START;
-			PlaySound("data/jet-start.wav", NULL, SND_FILENAME | SND_ASYNC);
+			//PlaySound("data/jet-start.wav", NULL, SND_FILENAME | SND_ASYNC);
 			m_fTimer = 0;
 		}
 		break;
@@ -90,13 +90,13 @@ void CPlayer2::Update(float dt)
 		if (v < 25.0f)
 		{
 			m_eSpeedState = SPEED_STOP;
-			PlaySound("data/jet-stop.wav", NULL, SND_FILENAME | SND_ASYNC);
+			//PlaySound("data/jet-stop.wav", NULL, SND_FILENAME | SND_ASYNC);
 			m_fTimer = 0;
 		}
 		else
 			if (m_fTimer > 1.f)
 			{
-				PlaySound("data/jet-cabin.wav", NULL, SND_FILENAME | SND_ASYNC);
+				//PlaySound("data/jet-cabin.wav", NULL, SND_FILENAME | SND_ASYNC);
 				m_fTimer = 0;
 			}
 		break;
@@ -188,7 +188,7 @@ void CPlayer2::Explode()
 {
 	m_pExplosionSprite->mPosition = m_pSprite->mPosition;
 	m_pExplosionSprite->SetFrame(0);
-	PlaySound("data/explosion.wav", NULL, SND_FILENAME | SND_ASYNC);
+	//PlaySound("data/explosion.wav", NULL, SND_FILENAME | SND_ASYNC);
 	m_bExplosion = true;
 }
 

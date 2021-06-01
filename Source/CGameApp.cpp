@@ -16,6 +16,8 @@
 #include <algorithm>
 #include <ctime>
 extern HINSTANCE g_hInst;
+HMENU m_hMenu;
+//void Addmenus();
 
 //-----------------------------------------------------------------------------
 // CGameApp Member Functions
@@ -38,6 +40,7 @@ CGameApp::CGameApp()
 	m_pEnemy = NULL;
 	m_pHeart = NULL;
 	m_LastFrameRate = 0;
+	void AddMenus(HWND);
 }
 
 //-----------------------------------------------------------------------------
@@ -204,6 +207,21 @@ LRESULT CALLBACK CGameApp::StaticWndProc(HWND hWnd, UINT Message, WPARAM wParam,
 	return DefWindowProc( hWnd, Message, wParam, lParam );
 }
 
+void AddMenus(HWND hWnd)
+{
+	m_hMenu = CreateMenu();
+
+	HMENU hFileMenu = CreateMenu();
+
+	AppendMenu(hFileMenu, MF_STRING, 1, "Save");
+	AppendMenu(hFileMenu, MF_STRING, 2, "Load");
+	AppendMenu(hFileMenu, MF_STRING, 3, "Exit");
+
+	AppendMenu(m_hMenu, MF_POPUP, (UINT_PTR)hFileMenu, "Menu");
+
+	SetMenu(hWnd, m_hMenu);
+}
+
 //-----------------------------------------------------------------------------
 // Name : DisplayWndProc ()
 // Desc : The display devices internal WndProc function. All messages being
@@ -217,6 +235,7 @@ LRESULT CGameApp::DisplayWndProc( HWND hWnd, UINT Message, WPARAM wParam, LPARAM
 	switch (Message)
 	{
 		case WM_CREATE:
+			AddMenus(hWnd);
 			break;
 		
 		case WM_CLOSE:
@@ -307,11 +326,52 @@ LRESULT CGameApp::DisplayWndProc( HWND hWnd, UINT Message, WPARAM wParam, LPARAM
 			case 6:
 				if (!m_pHeart->AdvanceExplosion())
 					KillTimer(m_hWnd, 6);
+			case 7:
+				if(!m_pPlayer->AdvanceWalk())
+					KillTimer(m_hWnd, 1);
 
 			}
 			break;
 
 		case WM_COMMAND:
+			switch (wParam)
+			{
+			case 1:
+			{
+
+
+				std::ofstream output;
+				output.open("data/save.txt");
+				double x1_axis, y1_axis, x2_axis, y2_axis, x3_axis, y3_axis;
+				m_pPlayer->GeterPositionX(x1_axis);
+				m_pPlayer->GeterPositionY(y1_axis);
+				m_pEnemy->GeterPositionX(x2_axis);
+				m_pEnemy->GeterPositionY(y2_axis);
+				m_pHeart->GeterPositionX(x3_axis);
+				m_pHeart->GeterPositionY(y3_axis);
+				output << x1_axis << " " << y1_axis << " ";
+				output << x2_axis << " " << y2_axis << " ";
+				output << x3_axis << " " << y3_axis;
+				output.close();
+			}
+			break;
+			case 2:
+			{
+				std::ifstream input;
+				input.open("data/save.txt");
+				double x1_axis, y1_axis, x2_axis, y2_axis, x3_axis, y3_axis;
+				input >> x1_axis >> y1_axis >> x2_axis >> y2_axis >> x3_axis >> y3_axis;
+				m_pPlayer->Position() = Vec2(x1_axis, y1_axis);
+				m_pEnemy->Position() = Vec2(x2_axis, y2_axis);
+				m_pHeart->Position() = Vec2(x3_axis, y3_axis);
+				input.close();
+			}
+			break;
+			case 3: {
+				ShutDown();
+			}
+			}
+
 			break;
 
 		default:
@@ -506,8 +566,14 @@ void CGameApp::ProcessInput( )
 	// Check the relevant keys
 	if ( pKeyBuffer[ VK_UP	] & 0xF0 ) Direction |= CPlayer::DIR_FORWARD;
 	if ( pKeyBuffer[ VK_DOWN  ] & 0xF0 ) Direction |= CPlayer::DIR_BACKWARD;
-	if ( pKeyBuffer[ VK_LEFT  ] & 0xF0 ) Direction |= CPlayer::DIR_LEFT;
-	if ( pKeyBuffer[ VK_RIGHT ] & 0xF0 ) Direction |= CPlayer::DIR_RIGHT;
+	if (pKeyBuffer[VK_LEFT] & 0xF0) { Direction |= CPlayer::DIR_LEFT; 
+		m_pPlayer->Walk();
+    	m_pPlayer->AdvanceWalk();
+	}
+	if (pKeyBuffer[VK_RIGHT] & 0xF0) { Direction |= CPlayer::DIR_RIGHT; 
+		m_pPlayer->Walk();
+		m_pPlayer->AdvanceWalk();
+	}
 
 	if (pKeyBuffer[0x57] & 0xF0) {
 		Direction2 |= CPlayer2::DIR_FORWARD;
@@ -564,6 +630,8 @@ void CGameApp::ProcessInput( )
 
 	// Move the player
 	m_pPlayer->Move(Direction);
+//	m_pPlayer->Walk();
+//	m_pPlayer->AdvanceWalk();
 	m_pPlayer2->Move(Direction2);
 	m_pEnemy->Move(Direction3);
 	
@@ -601,17 +669,21 @@ void CGameApp::ProcessInput( )
 	}
 
 
-	if (pKeyBuffer[VK_NUMPAD4] & 0xF0)
+	if (pKeyBuffer[VK_NUMPAD4] & 0xF0) {
 		m_pPlayer->MoveLeft(m_pBBuffer);
+	}
 
-	if (pKeyBuffer[VK_NUMPAD2] & 0xF0)
+	if (pKeyBuffer[VK_NUMPAD2] & 0xF0) {
 		m_pPlayer->MoveDown(m_pBBuffer);
+	}
 
-	if (pKeyBuffer[VK_NUMPAD6] & 0xF0)
+	if (pKeyBuffer[VK_NUMPAD6] & 0xF0) {
 		m_pPlayer->MoveRight(m_pBBuffer);
+	}
 
-	if (pKeyBuffer[VK_NUMPAD8] & 0xF0)
+	if (pKeyBuffer[VK_NUMPAD8] & 0xF0) {
 		m_pPlayer->MoveUp(m_pBBuffer);
+	}
 
 
 	// Now process the mouse (if the button is pressed)

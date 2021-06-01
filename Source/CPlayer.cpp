@@ -36,6 +36,11 @@ CPlayer::CPlayer(const BackBuffer *pBackBuffer)
 	m_bExplosion		= false;
 	m_iExplosionFrame	= 0;
 
+	m_pWalkingSprite = new AnimatedSprite("data/walking.bmp", "data/walkingMask.bmp", r, 15);
+	m_pWalkingSprite->setBackBuffer(pBackBuffer);
+	m_bWalking = false;
+	m_iWalkingFrame = 0;
+
 	bullet = new Sprite("data/swordAndMask.bmp", RGB(0xff, 0x00, 0xff));
 	bullet->setBackBuffer(pBackBuffer);
 	m_bullet = false;
@@ -55,6 +60,8 @@ CPlayer::~CPlayer()
 	delete bullet;
 	delete bullet2;
 	delete m_pExplosionSprite;
+	delete m_pWalkingSprite;
+
 }
 
 void CPlayer::Update(float dt)
@@ -83,7 +90,7 @@ void CPlayer::Update(float dt)
 		if(v > 35.0f)
 		{
 			m_eSpeedState = SPEED_START;
-			PlaySound("data/jet-start.wav", NULL, SND_FILENAME | SND_ASYNC);
+			//PlaySound("data/jet-start.wav", NULL, SND_FILENAME | SND_ASYNC);
 			m_fTimer = 0;
 		}
 		break;
@@ -91,13 +98,13 @@ void CPlayer::Update(float dt)
 		if(v < 25.0f)
 		{
 			m_eSpeedState = SPEED_STOP;
-			PlaySound("data/jet-stop.wav", NULL, SND_FILENAME | SND_ASYNC);
+			//PlaySound("data/jet-stop.wav", NULL, SND_FILENAME | SND_ASYNC);
 			m_fTimer = 0;
 		}
 		else
 			if(m_fTimer > 1.f)
 			{
-				PlaySound("data/jet-cabin.wav", NULL, SND_FILENAME | SND_ASYNC);
+				//PlaySound("data/jet-cabin.wav", NULL, SND_FILENAME | SND_ASYNC);
 				m_fTimer = 0;
 			}
 		break;
@@ -116,10 +123,16 @@ void CPlayer::Draw()
 		bullet2->draw();
 	}
 
-	if(!m_bExplosion)
+	if (!m_bExplosion && !m_bWalking)
 		m_pSprite->draw();
+		//m_pWalkingSprite->draw();
 	else
-		m_pExplosionSprite->draw();
+		if (!m_bWalking)
+			m_pExplosionSprite->draw();
+		else
+			m_pWalkingSprite->draw();
+
+
 }
 
 void CPlayer::Move(ULONG ulDirection)
@@ -209,8 +222,16 @@ void CPlayer::Explode()
 {
 	m_pExplosionSprite->mPosition = m_pSprite->mPosition;
 	m_pExplosionSprite->SetFrame(0);
-	PlaySound("data/explosion.wav", NULL, SND_FILENAME | SND_ASYNC);
+	//PlaySound("data/explosion.wav", NULL, SND_FILENAME | SND_ASYNC);
 	m_bExplosion = true;
+}
+
+void CPlayer::Walk()
+{
+	m_pWalkingSprite->mPosition = m_pSprite->mPosition;
+	m_pWalkingSprite->SetFrame(0);
+	//PlaySound("data/explosion.wav", NULL, SND_FILENAME | SND_ASYNC);
+	m_bWalking = true;
 }
 
 bool CPlayer::AdvanceExplosion()
@@ -231,9 +252,32 @@ bool CPlayer::AdvanceExplosion()
 	return true;
 }
 
+bool CPlayer::AdvanceWalk()
+{
+	if (m_bWalking)
+	{
+		m_pWalkingSprite->SetFrame(m_iWalkingFrame++);
+		if (m_iWalkingFrame == m_pWalkingSprite->GetFrameCount())
+		{
+			m_bWalking = false;
+			m_iWalkingFrame = 0;
+			//m_pSprite->mVelocity = Vec2(0, 0);
+			m_eSpeedState = SPEED_STOP;
+			return false;
+		}
+	}
+
+	return true;
+}
+
 bool CPlayer::ifExploded()
 {
 	return m_bExplosion;
+}
+
+bool CPlayer::ifWalking()
+{
+	return m_bWalking;
 }
 
 void CPlayer::Shoot() {
